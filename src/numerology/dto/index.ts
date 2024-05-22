@@ -1,1 +1,2 @@
-export * from "./numerology.dto";
+export * from "./numerology-request.dto";
+export * from "./numerology-response.dto"
