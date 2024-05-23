@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { datasource } from './datasource';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Env } from '@utils';
 
 @Module({
-    imports: [TypeOrmModule.forRoot(datasource.options)]
+    imports: [MongooseModule.forRoot(Env.DB_URI, { user: Env.DB_USER, pass: Env.DB_PASS, dbName: Env.DB_NAME, autoCreate: true })]
 })
 export class DbModule {}
