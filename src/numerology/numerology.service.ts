@@ -1,8 +1,19 @@
 import { Injectable } from "@nestjs/common";
-import { NumerologyRequestDto, NumerologyResponseDto } from "./dto";
+import { AddEntryDto, GetEntriesQueryDto, NumerologyRequestDto, NumerologyResponseDto, UpdateEntryDto } from "./dto";
+import { InjectModel } from "@nestjs/mongoose";
+import { NumerologyEntry, NumerologyEntryDescription } from "@schemas";
+import { Model, Types } from "mongoose";
+import { NumerologyNotFoundApiError } from "./errors";
 
 @Injectable()
 export class NumerologyService {
+    constructor(
+        @InjectModel(NumerologyEntry.name)
+        private readonly numerologyEntryModel: Model<NumerologyEntry>,
+        @InjectModel(NumerologyEntryDescription.name)
+        private readonly numerologyEntryDescriptionModel: Model<NumerologyEntryDescription>
+    ) {}
+
     private readonly charMap = {
         a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 1,
         k: 2, l: 3, m: 4, n: 5, o: 6, p: 7, q: 8, r: 9, s: 1, t: 2,
@@ -162,5 +173,44 @@ export class NumerologyService {
             capstoneNumber: this.calculateCapstoneNumber(fullName),
             firstVowelNumber: this.calculateFirstVowelNumber(fullName)
         }
+    }
+
+    async addEntry(dto: AddEntryDto) {
+        let entry = new this.numerologyEntryModel({
+            type: dto.type,
+            number: dto.number,
+            description: dto.description.map((item) => new this.numerologyEntryDescriptionModel({
+                content: item.content,
+                lang: item.lang
+            }))
+        });
+        entry = await entry.save();
+        return entry;
+    }
+
+    async findEntry(id: string) {
+        if (!Types.ObjectId.isValid(id)) throw new NumerologyNotFoundApiError(id);
+        const entry = await this.numerologyEntryModel.findById(id);
+        if (!entry) throw new NumerologyNotFoundApiError(id);
+        return entry;
+    }
+
+    async updateEntry(id: string, dto: UpdateEntryDto) {
+        let entry = await this.findEntry(id);
+        entry.type = dto.type;
+        entry.number = dto.number;
+        entry.description = dto.description.map((item) => new this.numerologyEntryDescriptionModel({
+            content: item.content,
+            lang: item.lang
+        }));
+        entry = await entry.save();
+        return entry;
+    }
+
+    async getEntries(query: GetEntriesQueryDto) {
+        let entries = await this.numerologyEntryModel.find({
+            type: query.type
+        });
+        return entries;
     }
 }

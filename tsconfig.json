@@ -20,7 +20,7 @@
     "paths": {
       "@utils": ["src/utils"],
       "@errors": ["src/errors"],
-      "@entities": ["src/db/entities"],
+      "@schemas": ["src/db/schemas"],
       // Remember to update when adding new resource
       "@sample": ["src/sample"]
     }
