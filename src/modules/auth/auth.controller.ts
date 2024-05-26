@@ -1,8 +1,10 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Query, Res } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
-import { ApiResponseDto, SwaggerApiResponse } from "@utils";
-import { GetLoginUriQuery } from "./dto";
+import { ApiResponseDto, Env, SwaggerApiResponse } from "@utils";
+import { AuthenticateResponseDto, GetLoginUriQuery } from "./dto";
+import { AccountResponseDto } from "@modules/accounts/dto";
+import { Response } from "express";
 
 @Controller("auth")
 @ApiTags("auth")
@@ -18,14 +20,18 @@ export class AuthController {
     }
 
     @Get("sign-up-google")
-    async signUpWithGoogle(@Query("code") code: string) {
-        const data = await this.authService.signUpWithGoogle(code);
-        return "OK";
+    async signUpWithGoogle(@Query("code") code: string, @Res() res: Response) {
+        const [account, accessToken] = await this.authService.signUpWithGoogle(code);
+        res.cookie("accessToken", accessToken);
+        res.redirect(Env.APP_REDIRECT_URI);
+        // return new ApiResponseDto<AuthenticateResponseDto>({ account: AccountResponseDto.fromEntity(account), accessToken: accessToken });
     }
 
     @Get("login-google")
-    async loginWithGoogle(@Query("code") code: string) {
-        const data = await this.authService.loginWithGoogle(code);
-        return "OK";
+    async loginWithGoogle(@Query("code") code: string, @Res() res: Response) {
+        const [account, accessToken] = await this.authService.loginWithGoogle(code);
+        res.cookie("accessToken", accessToken);
+        res.redirect(Env.APP_REDIRECT_URI);
+        // return new ApiResponseDto<AuthenticateResponseDto>({ account: AccountResponseDto.fromEntity(account), accessToken: accessToken });
     }
 }
