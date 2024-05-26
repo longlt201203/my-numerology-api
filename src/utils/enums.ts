@@ -18,3 +18,12 @@ export enum LanguageType {
     VN = "vn",
     EN = "en"
 }
+
+export enum OAuthProvider {
+    GOOGLE = "google"
+}
+
+export enum CallbackMode {
+    LOGIN = "login",
+    SIGN_UP = "signUp"
+}
