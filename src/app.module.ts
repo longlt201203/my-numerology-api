@@ -3,8 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { MyExceptionFilter, ValidationPipe } from '@utils';
-import { NumerologyModule } from './numerology/numerology.module';
 import { DbModule } from './db/db.module';
+import { NumerologyModule } from '@modules/numerology';
 
 @Module({
   imports: [DbModule, NumerologyModule],

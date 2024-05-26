@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AddEntryDto, GetEntriesQueryDto, NumerologyRequestDto, NumerologyResponseDto, UpdateEntryDto } from "./dto";
+import { AddEntryDto, GetEntriesQueryDto, ImportEntriesDto, NumerologyRequestDto, NumerologyResponseDto, UpdateEntryDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { NumerologyEntry, NumerologyEntryDescription } from "@schemas";
 import { Model, Types } from "mongoose";
@@ -208,9 +208,31 @@ export class NumerologyService {
     }
 
     async getEntries(query: GetEntriesQueryDto) {
-        let entries = await this.numerologyEntryModel.find({
-            type: query.type
+        const findQuery: any = {};
+        if (query.type) findQuery.type = query.type;
+        let entries = await this.numerologyEntryModel.find(findQuery, null, {
+            sort: {
+                type: 1,
+                number: 1
+            }
         });
+        return entries;
+    }
+
+    async importEntries(dto: ImportEntriesDto) {
+        let entries = [];
+        for (const item of dto.data) {
+            entries.push(new this.numerologyEntryModel({
+                type: item.type,
+                number: item.number,
+                description: item.description.map((subitem) => new this.numerologyEntryDescriptionModel({
+                    lang: subitem.lang,
+                    content: subitem.content
+                }))
+            }));
+        }
+        await this.numerologyEntryModel.deleteMany();
+        entries = await this.numerologyEntryModel.insertMany(entries);
         return entries;
     }
 }

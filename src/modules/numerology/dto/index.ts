@@ -6,3 +6,4 @@ export * from "./entry-response.dto";
 export * from "./entry-description-response.dto";
 export * from "./update-entry.dto";
 export * from "./get-entries-query.dto";
+export * from "./import-entries.dto";

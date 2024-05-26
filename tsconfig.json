@@ -21,8 +21,7 @@
       "@utils": ["src/utils"],
       "@errors": ["src/errors"],
       "@schemas": ["src/db/schemas"],
-      // Remember to update when adding new resource
-      "@sample": ["src/sample"]
+      "@modules/*": ["src/modules/*"]
     }
   }
 }

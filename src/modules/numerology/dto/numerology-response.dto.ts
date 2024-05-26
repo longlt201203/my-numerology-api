@@ -28,13 +28,13 @@ export class NumerologyResponseDto {
     @ApiProperty()
     balanceNumber: number;
 
-    @ApiProperty()
+    @ApiProperty({ type: [Number] })
     challengeNumbers: number[];
 
-    @ApiProperty()
+    @ApiProperty({ type: [Number] })
     pinnacleNumbers: number[];
 
-    @ApiProperty()
+    @ApiProperty({ type: [Number] })
     hiddenPassionNumbers: number[];
 
     @ApiProperty()
