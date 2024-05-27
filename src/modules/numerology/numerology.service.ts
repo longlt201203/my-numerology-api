@@ -179,10 +179,12 @@ export class NumerologyService {
         let entry = new this.numerologyEntryModel({
             type: dto.type,
             number: dto.number,
-            description: dto.description.map((item) => new this.numerologyEntryDescriptionModel({
-                content: item.content,
-                lang: item.lang
-            }))
+            lang: dto.lang,
+            content: dto.content,
+            // description: dto.description.map((item) => new this.numerologyEntryDescriptionModel({
+            //     content: item.content,
+            //     lang: item.lang
+            // }))
         });
         entry = await entry.save();
         return entry;
@@ -199,10 +201,12 @@ export class NumerologyService {
         let entry = await this.findEntry(id);
         entry.type = dto.type;
         entry.number = dto.number;
-        entry.description = dto.description.map((item) => new this.numerologyEntryDescriptionModel({
-            content: item.content,
-            lang: item.lang
-        }));
+        entry.lang = dto.lang;
+        entry.content = dto.content;
+        // entry.description = dto.description.map((item) => new this.numerologyEntryDescriptionModel({
+        //     content: item.content,
+        //     lang: item.lang
+        // }));
         entry = await entry.save();
         return entry;
     }
@@ -210,6 +214,7 @@ export class NumerologyService {
     async getEntries(query: GetEntriesQueryDto) {
         const findQuery: any = {};
         if (query.type) findQuery.type = query.type;
+        if (query.lang) findQuery.lang = query.lang;
         let entries = await this.numerologyEntryModel.find(findQuery, null, {
             sort: {
                 type: 1,
@@ -225,10 +230,12 @@ export class NumerologyService {
             entries.push(new this.numerologyEntryModel({
                 type: item.type,
                 number: item.number,
-                description: item.description.map((subitem) => new this.numerologyEntryDescriptionModel({
-                    lang: subitem.lang,
-                    content: subitem.content
-                }))
+                lang: item.lang,
+                content: item.content,
+                // description: item.description.map((subitem) => new this.numerologyEntryDescriptionModel({
+                //     lang: subitem.lang,
+                //     content: subitem.content
+                // }))
             }));
         }
         await this.numerologyEntryModel.deleteMany();

@@ -1,4 +1,4 @@
-export enum NumerologyEntryTypeEnum {
+export enum NumerologyEntryType {
     LIFE_PATH = "lifePath",
     SOUL_URGE = "soulUrge",
     EXPRESSION = "expression",
