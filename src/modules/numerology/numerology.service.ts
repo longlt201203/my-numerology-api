@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { AddEntryDto, GetEntriesQueryDto, ImportEntriesDto, NumerologyRequestDto, NumerologyResponseDto, UpdateEntryDto } from "./dto";
+import { GetEntriesQueryDto, NumerologyRequestDto, NumerologyResponseDto, UpdateOrCreateEntryDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
-import { NumerologyEntry, NumerologyEntryDescription } from "@schemas";
+import { Language, NumerologyEntry, NumerologyEntryDescription } from "@schemas";
 import { Model, Types } from "mongoose";
 import { NumerologyNotFoundApiError } from "./errors";
+import { LanguageService } from "@modules/language";
 
 @Injectable()
 export class NumerologyService {
@@ -11,7 +12,8 @@ export class NumerologyService {
         @InjectModel(NumerologyEntry.name)
         private readonly numerologyEntryModel: Model<NumerologyEntry>,
         @InjectModel(NumerologyEntryDescription.name)
-        private readonly numerologyEntryDescriptionModel: Model<NumerologyEntryDescription>
+        private readonly numerologyEntryDescriptionModel: Model<NumerologyEntryDescription>,
+        private readonly languageService: LanguageService
     ) {}
 
     private readonly charMap = {
@@ -175,21 +177,6 @@ export class NumerologyService {
         }
     }
 
-    async addEntry(dto: AddEntryDto) {
-        let entry = new this.numerologyEntryModel({
-            type: dto.type,
-            number: dto.number,
-            lang: dto.lang,
-            content: dto.content,
-            // description: dto.description.map((item) => new this.numerologyEntryDescriptionModel({
-            //     content: item.content,
-            //     lang: item.lang
-            // }))
-        });
-        entry = await entry.save();
-        return entry;
-    }
-
     async findEntry(id: string) {
         if (!Types.ObjectId.isValid(id)) throw new NumerologyNotFoundApiError(id);
         const entry = await this.numerologyEntryModel.findById(id);
@@ -197,49 +184,47 @@ export class NumerologyService {
         return entry;
     }
 
-    async updateEntry(id: string, dto: UpdateEntryDto) {
-        let entry = await this.findEntry(id);
-        entry.type = dto.type;
-        entry.number = dto.number;
-        entry.lang = dto.lang;
-        entry.content = dto.content;
+    async updateOrCreateEntry(dto: UpdateOrCreateEntryDto) {
+        const language = await this.languageService.getOneByCode(dto.lang);
+
+        let entry = await this.numerologyEntryModel.findOne({ type: dto.type, lang: language, number: dto.number })
+        
+        if (entry) {
+            entry.type = dto.type;
+            entry.number = dto.number;
+            entry.lang = language;
+            entry.content = dto.content;
+        } else {
+            entry = new this.numerologyEntryModel({
+                type: dto.type,
+                number: dto.number,
+                lang: language,
+                content: dto.content,
+            });
+        }
+
+        
         // entry.description = dto.description.map((item) => new this.numerologyEntryDescriptionModel({
         //     content: item.content,
         //     lang: item.lang
         // }));
         entry = await entry.save();
-        return entry;
+        return await entry.populate("lang");
     }
 
     async getEntries(query: GetEntriesQueryDto) {
         const findQuery: any = {};
+        const findLangQuery: any = {};
         if (query.type) findQuery.type = query.type;
-        if (query.lang) findQuery.lang = query.lang;
-        let entries = await this.numerologyEntryModel.find(findQuery, null, {
-            sort: {
-                type: 1,
-                number: 1
-            }
-        });
-        return entries;
-    }
-
-    async importEntries(dto: ImportEntriesDto) {
-        let entries = [];
-        for (const item of dto.data) {
-            entries.push(new this.numerologyEntryModel({
-                type: item.type,
-                number: item.number,
-                lang: item.lang,
-                content: item.content,
-                // description: item.description.map((subitem) => new this.numerologyEntryDescriptionModel({
-                //     lang: subitem.lang,
-                //     content: subitem.content
-                // }))
-            }));
-        }
-        await this.numerologyEntryModel.deleteMany();
-        entries = await this.numerologyEntryModel.insertMany(entries);
-        return entries;
+        if (query.lang) findLangQuery.code = query.lang;
+        let entries = await this.numerologyEntryModel
+            .find(findQuery, null, {
+                sort: {
+                    type: 1,
+                    number: 1
+                }
+            })
+            .populate({ path: "lang", match: findLangQuery });
+        return entries.filter(item => item.lang != null);
     }
 }

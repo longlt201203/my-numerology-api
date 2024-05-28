@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { LanguageType, NumerologyEntryType } from "@utils";
+import { NumerologyEntryType } from "@utils";
 import { IsEnum, IsOptional } from "class-validator";
 
 export class GetEntriesQueryDto {
@@ -8,8 +8,7 @@ export class GetEntriesQueryDto {
     @IsOptional()
     type?: NumerologyEntryType;
 
-    @ApiProperty({ required: false, enum: LanguageType })
-    @IsEnum(LanguageType)
+    @ApiProperty({ required: false })
     @IsOptional()
-    lang?: LanguageType;
+    lang?: string;
 }

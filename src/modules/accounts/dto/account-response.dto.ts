@@ -6,7 +6,7 @@ export class AccountResponseDto {
 
     static fromEntity(entity: Account): AccountResponseDto {
         return {
-            id: entity._id,
+            id: entity._id.toString(),
             email: entity.email
         }
     }

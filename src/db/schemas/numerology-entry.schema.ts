@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { LanguageType, NumerologyEntryType } from "@utils";
 import { HydratedDocument, SchemaTypes } from "mongoose";
+import { Language } from "src/db/schemas/language.schema";
 // import { NumerologyEntryDescription, NumerologyEntryDescriptionSchema } from "./numerology-entry-description.schema";
 
 export type NumerologyEntryDocument = HydratedDocument<NumerologyEntry>;
@@ -15,8 +16,8 @@ export class NumerologyEntry {
     @Prop({ type: SchemaTypes.Number })
     number: number;
 
-    @Prop({ type: SchemaTypes.String, enum: LanguageType })
-    lang: LanguageType;
+    @Prop({ type: SchemaTypes.ObjectId, ref: "Language" })
+    lang: Language;
 
     @Prop({ type: SchemaTypes.String })
     content: string;

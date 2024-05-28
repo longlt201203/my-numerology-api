@@ -1,10 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { LanguageType, NumerologyEntryType } from "@utils";
-import { EntryDescriptionRequestDto } from "./entry-description-request.dto";
-import { IsEnum, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
-export class AddEntryDto {
+export class UpdateOrCreateEntryDto {
     @ApiProperty({ enum: NumerologyEntryType })
     @IsEnum(NumerologyEntryType)
     type: NumerologyEntryType;
@@ -21,9 +19,4 @@ export class AddEntryDto {
     @IsString()
     @IsNotEmpty()
     content: string;
-
-    // @ApiProperty({ type: [EntryDescriptionRequestDto] })
-    // @Type(() => EntryDescriptionRequestDto)
-    // @ValidateNested({ each: true })
-    // description: EntryDescriptionRequestDto[];
 }
