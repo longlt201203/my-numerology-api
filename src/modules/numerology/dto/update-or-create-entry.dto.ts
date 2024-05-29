@@ -19,4 +19,9 @@ export class UpdateOrCreateEntryDto {
     @IsString()
     @IsNotEmpty()
     content: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    summary: string;
 }

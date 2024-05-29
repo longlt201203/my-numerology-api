@@ -194,12 +194,14 @@ export class NumerologyService {
             entry.number = dto.number;
             entry.lang = language;
             entry.content = dto.content;
+            entry.summary = dto.summary;
         } else {
             entry = new this.numerologyEntryModel({
                 type: dto.type,
                 number: dto.number,
                 lang: language,
                 content: dto.content,
+                summary: dto.summary
             });
         }
 

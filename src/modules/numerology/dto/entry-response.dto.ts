@@ -19,6 +19,9 @@ export class EntryResponseDto {
     @ApiProperty()
     content: string;
 
+    @ApiProperty()
+    summary: string;
+
     // @ApiProperty({ type: [EntryDescriptionResponseDto] })
     // description: EntryDescriptionResponseDto[];
 
@@ -28,7 +31,8 @@ export class EntryResponseDto {
             type: entity.type,
             number: entity.number,
             lang: entity.lang.code,
-            content: entity.content
+            content: entity.content,
+            summary: entity.summary
             // description: entity.description.map((item) => EntryDescriptionResponseDto.fromEntity(item))
         }
     }

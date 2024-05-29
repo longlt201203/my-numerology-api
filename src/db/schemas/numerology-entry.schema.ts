@@ -22,6 +22,9 @@ export class NumerologyEntry {
     @Prop({ type: SchemaTypes.String })
     content: string;
 
+    @Prop({ type: SchemaTypes.String })
+    summary: string;
+
     // @Prop({ type: [{ type: NumerologyEntryDescriptionSchema }] })
     // description: NumerologyEntryDescription[];
 }
