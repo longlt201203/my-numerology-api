@@ -27,3 +27,9 @@ export enum CallbackMode {
     LOGIN = "login",
     SIGN_UP = "signUp"
 }
+
+export enum NumerologyExplainType {
+    WHAT_IS_IT = "whatIsIt",
+    HISTORY = "history",
+    RESOURCES = "resources"
+}

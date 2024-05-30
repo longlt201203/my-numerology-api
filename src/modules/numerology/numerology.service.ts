@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { GetEntriesQueryDto, NumerologyRequestDto, NumerologyResponseDto, UpdateOrCreateEntryDto } from "./dto";
+import { GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, NumerologyResponseDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
-import { Language, NumerologyEntry, NumerologyEntryDescription } from "@schemas";
+import { Language, NumerologyCalculateExplain, NumerologyEntry, NumerologyEntryDescription, NumerologyExplain } from "@schemas";
 import { Model, Types } from "mongoose";
 import { NumerologyNotFoundApiError } from "./errors";
 import { LanguageService } from "@modules/language";
@@ -13,6 +13,10 @@ export class NumerologyService {
         private readonly numerologyEntryModel: Model<NumerologyEntry>,
         @InjectModel(NumerologyEntryDescription.name)
         private readonly numerologyEntryDescriptionModel: Model<NumerologyEntryDescription>,
+        @InjectModel(NumerologyExplain.name)
+        private readonly numerologyExplainModel: Model<NumerologyExplain>,
+        @InjectModel(NumerologyCalculateExplain.name)
+        private readonly numerologyCalculateExplainModel: Model<NumerologyCalculateExplain>,
         private readonly languageService: LanguageService
     ) {}
 
@@ -190,9 +194,6 @@ export class NumerologyService {
         let entry = await this.numerologyEntryModel.findOne({ type: dto.type, lang: language, number: dto.number })
         
         if (entry) {
-            entry.type = dto.type;
-            entry.number = dto.number;
-            entry.lang = language;
             entry.content = dto.content;
             entry.summary = dto.summary;
         } else {
@@ -228,5 +229,58 @@ export class NumerologyService {
             })
             .populate({ path: "lang", match: findLangQuery });
         return entries.filter(item => item.lang != null);
+    }
+
+    async updateOrCreateExplain(dto: UpdateOrCreateExplainDto) {
+        const language = await this.languageService.getOneByCode(dto.lang);
+        
+        let entity = await this.numerologyExplainModel.findOne({
+            type: dto.type,
+            lang: language
+        });
+
+        if (entity) {
+            entity.content = dto.content;
+        } else {
+            entity = new this.numerologyExplainModel({
+                type: dto.type,
+                lang: language,
+                content: dto.content
+            });
+        }
+
+        entity = await entity.save();
+        return entity;
+    }
+
+    async updateOrCreateCalculateExplain(dto: UpdateOrCreateCalculateExplainDto) {
+        const language = await this.languageService.getOneByCode(dto.lang);
+
+        let entity = await this.numerologyCalculateExplainModel.findOne({
+            type: dto.type,
+            lang: language
+        });
+
+        if (entity) {
+            entity.content = dto.content;
+        } else {
+            entity = new this.numerologyCalculateExplainModel({
+                type: dto.type,
+                lang: language,
+                content: dto.content
+            });
+        }
+
+        entity = await entity.save();
+        return entity;
+    }
+
+    async getExplainData(query: GetExplainDataQueryDto) {
+        const language = await this.languageService.getOneByCode(query.lang);
+        
+        return await Promise.all([
+            this.numerologyExplainModel.find({ lang: language }),
+            this.numerologyCalculateExplainModel.find({ lang: language })
+        ]);
     }
 }

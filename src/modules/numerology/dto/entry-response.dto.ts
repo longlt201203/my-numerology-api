@@ -27,7 +27,7 @@ export class EntryResponseDto {
 
     static fromEntity(entity: NumerologyEntry): EntryResponseDto {
         return {
-            id: entity._id,
+            id: entity._id.toString(),
             type: entity.type,
             number: entity.number,
             lang: entity.lang.code,
@@ -38,6 +38,6 @@ export class EntryResponseDto {
     }
 
     static fromEntities(entities: NumerologyEntry[]): EntryResponseDto[] {
-        return entities.map((item) => this.fromEntity(item));
+        return entities.map(this.fromEntity);
     }
 }

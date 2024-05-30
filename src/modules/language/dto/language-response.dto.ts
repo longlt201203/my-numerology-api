@@ -12,6 +12,6 @@ export class LanguageResponseDto {
     }
 
     static fromEntities(entities: Language[]): LanguageResponseDto[] {
-        return entities.map((item) => this.fromEntity(item));
+        return entities.map(this.fromEntity);
     }
 }

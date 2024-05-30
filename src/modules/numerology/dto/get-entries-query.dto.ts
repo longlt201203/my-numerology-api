@@ -8,7 +8,7 @@ export class GetEntriesQueryDto {
     @IsOptional()
     type?: NumerologyEntryType;
 
-    @ApiProperty({ required: false })
+    @ApiProperty({ required: false, description: "Language Code" })
     @IsOptional()
     lang?: string;
 }
