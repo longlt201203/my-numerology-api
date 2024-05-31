@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { NumerologyService } from "./numerology.service";
 import { ApiTags } from "@nestjs/swagger";
-import { EntryResponseDto, GetEntriesQueryDto, GetExplainDataQueryDto, GetExplainDataResponseDto, NumerologyCalculateExplainResponseDto, NumerologyExplainResponseDto, NumerologyRequestDto, NumerologyResponseDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
+import { EntryResponseDto, GetEntriesQueryDto, GetExplainDataQueryDto, GetExplainDataResponseDto, NumerologyCalculateExplainResponseDto, NumerologyExplainResponseDto, NumerologyRequestDto, NumerologyResponseDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
 import { ApiResponseDto, SwaggerApiResponse } from "@utils";
 
 @Controller("numerology")
@@ -44,8 +44,15 @@ export class NumerologyController {
     }
 
     @Get("explain-data")
+    @SwaggerApiResponse(GetExplainDataResponseDto)
     async getExplainData(@Query() query: GetExplainDataQueryDto) {
         const [explainList, calculateExplainList] = await this.numerologyService.getExplainData(query);
         return new ApiResponseDto(GetExplainDataResponseDto.from(explainList, calculateExplainList));
+    }
+
+    @Put("save-explain-data")
+    async saveExplainData(@Body() dto: SaveExplainDataDto) {
+        await this.numerologyService.saveExplainData(dto);
+        return new ApiResponseDto(null, null, "Update successfully!");
     }
 }

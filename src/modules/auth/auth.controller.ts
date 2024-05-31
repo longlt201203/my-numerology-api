@@ -23,15 +23,28 @@ export class AuthController {
     async signUpWithGoogle(@Query("code") code: string, @Res() res: Response) {
         const [account, accessToken] = await this.authService.signUpWithGoogle(code);
         res.cookie("accessToken", accessToken);
-        res.redirect(Env.APP_REDIRECT_URI);
+        res.redirect(Env.APP_LOGIN_REDIRECT_URI);
         // return new ApiResponseDto<AuthenticateResponseDto>({ account: AccountResponseDto.fromEntity(account), accessToken: accessToken });
     }
 
     @Get("login-google")
     async loginWithGoogle(@Query("code") code: string, @Res() res: Response) {
         const [account, accessToken] = await this.authService.loginWithGoogle(code);
-        res.cookie("accessToken", accessToken);
-        res.redirect(Env.APP_REDIRECT_URI);
+        res.cookie("accessToken", accessToken, { httpOnly: true });
+        res.redirect(Env.APP_LOGIN_REDIRECT_URI);
         // return new ApiResponseDto<AuthenticateResponseDto>({ account: AccountResponseDto.fromEntity(account), accessToken: accessToken });
+    }
+
+    @Get("login-google-developer")
+    async loginWithGoogleDeveloper(@Query("code") code: string, @Res() res: Response) {
+        const [account, accessToken] = await this.authService.loginWithGoogle(code, true);
+        res.cookie("accessToken", accessToken, { httpOnly: true });
+        res.redirect(Env.APP_LOGIN_DEVELOPER_REDIRECT_URI);
+    }
+
+    @Get("logout")
+    async logout(@Res() res: Response) {
+        res.clearCookie("accessToken");
+        res.redirect(Env.APP_LOGOUT_REDIRECT_URI);
     }
 }

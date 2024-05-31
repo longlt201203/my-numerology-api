@@ -1,5 +1,4 @@
-import { LanguageType, NumerologyEntryType } from "@utils";
-import { EntryDescriptionResponseDto } from "./entry-description-response.dto";
+import { NumerologyEntryType } from "@utils";
 import { NumerologyEntry } from "@schemas";
 import { ApiProperty } from "@nestjs/swagger";
 
@@ -7,7 +6,7 @@ export class EntryResponseDto {
     @ApiProperty()
     id: string;
 
-    @ApiProperty({ enum: LanguageType })
+    @ApiProperty()
     lang: string;
 
     @ApiProperty({ enum: NumerologyEntryType })

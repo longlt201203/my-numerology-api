@@ -18,9 +18,21 @@ export class AuthService {
     getLoginUri(query: GetLoginUriQuery) {
         switch (query.provider) {
             case OAuthProvider.GOOGLE:
+                let redirectUri = "";
+                switch (query.callbackMode) {
+                    case CallbackMode.LOGIN:
+                        redirectUri = Env.GOOGLE_LOGIN_REDIRECT_URI;
+                        break;
+                    case CallbackMode.SIGN_UP:
+                        redirectUri = Env.GOOGLE_SIGN_UP_REDIRECT_URI;
+                        break;
+                    case CallbackMode.DEVELOPER:
+                        redirectUri = Env.GOOGLE_LOGIN_DEVELOPER_REDIRECT_URI;
+                        break;
+                }
                 return this.googleService.getOauth2Uri({
                     clientId: Env.GOOGLE_CLIENT_ID,
-                    redirectUri: query.callbackMode == CallbackMode.LOGIN ? Env.GOOGLE_LOGIN_REDIRECT_URI : Env.GOOGLE_SIGN_UP_REDIRECT_URI,
+                    redirectUri: redirectUri,
                     responseType: "code",
                     scopes: [GoogleService.SCOPE_EMAIL, GoogleService.SCOPE_PROFILE]
                 });
@@ -28,12 +40,25 @@ export class AuthService {
     }
 
     async getGoogleTokenInfo(code: string, mode: CallbackMode) {
+        let redirectUri = "";
+        switch (mode) {
+            case CallbackMode.LOGIN:
+                redirectUri = Env.GOOGLE_LOGIN_REDIRECT_URI;
+                break;
+            case CallbackMode.SIGN_UP:
+                redirectUri = Env.GOOGLE_SIGN_UP_REDIRECT_URI;
+                break;
+            case CallbackMode.DEVELOPER:
+                redirectUri = Env.GOOGLE_LOGIN_DEVELOPER_REDIRECT_URI;
+                break;
+        }
+
         const token = await this.googleService.getToken({
             clientId: Env.GOOGLE_CLIENT_ID,
             clientSecret: Env.GOOGLE_CLIENT_SECRET,
             code: code,
             grantType: "authorization_code",
-            redirectUri: mode == CallbackMode.LOGIN ? Env.GOOGLE_LOGIN_REDIRECT_URI : Env.GOOGLE_SIGN_UP_REDIRECT_URI
+            redirectUri: redirectUri
         });
 
         if (!token.id_token) throw new MissingGoogleIdTokenError();
@@ -42,8 +67,8 @@ export class AuthService {
         return tokenInfo;
     }
 
-    async loginWithGoogle(code: string): Promise<[Account, string]> {
-        const tokenInfo = await this.getGoogleTokenInfo(code, CallbackMode.LOGIN);
+    async loginWithGoogle(code: string, developer?: boolean): Promise<[Account, string]> {
+        const tokenInfo = await this.getGoogleTokenInfo(code, developer ? CallbackMode.DEVELOPER : CallbackMode.LOGIN);
         if (!tokenInfo.email) throw new MissingEmailError();
 
         const account = await this.accountsService.getOneByEmail(tokenInfo.email);

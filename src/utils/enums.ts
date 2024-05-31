@@ -14,18 +14,14 @@ export enum NumerologyEntryType {
     FIRST_VOWEL = "firstVowel"
 }
 
-export enum LanguageType {
-    VN = "vn",
-    EN = "en"
-}
-
 export enum OAuthProvider {
     GOOGLE = "google"
 }
 
 export enum CallbackMode {
     LOGIN = "login",
-    SIGN_UP = "signUp"
+    SIGN_UP = "signUp",
+    DEVELOPER = "developer"
 }
 
 export enum NumerologyExplainType {

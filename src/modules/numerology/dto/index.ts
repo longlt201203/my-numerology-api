@@ -2,7 +2,6 @@ export * from "./numerology-request.dto";
 export * from "./numerology-response.dto";
 export * from "./entry-description-request.dto";
 export * from "./entry-response.dto";
-export * from "./entry-description-response.dto";
 export * from "./update-or-create-entry.dto";
 export * from "./get-entries-query.dto";
 export * from "./update-or-create-explain.dto";
@@ -11,3 +10,4 @@ export * from "./numerology-explain-response.dto";
 export * from "./numerology-calculate-explain-response.dto";
 export * from "./get-explain-data-query.dto";
 export * from "./get-explain-data-response.dto";
+export * from "./save-explain-data.dto"

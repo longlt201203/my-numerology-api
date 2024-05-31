@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, NumerologyResponseDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
+import { GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, NumerologyResponseDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
-import { Language, NumerologyCalculateExplain, NumerologyEntry, NumerologyEntryDescription, NumerologyExplain } from "@schemas";
+import { Language, NumerologyCalculateExplain, NumerologyEntry, NumerologyExplain } from "@schemas";
 import { Model, Types } from "mongoose";
 import { NumerologyNotFoundApiError } from "./errors";
 import { LanguageService } from "@modules/language";
@@ -11,14 +11,12 @@ export class NumerologyService {
     constructor(
         @InjectModel(NumerologyEntry.name)
         private readonly numerologyEntryModel: Model<NumerologyEntry>,
-        @InjectModel(NumerologyEntryDescription.name)
-        private readonly numerologyEntryDescriptionModel: Model<NumerologyEntryDescription>,
         @InjectModel(NumerologyExplain.name)
         private readonly numerologyExplainModel: Model<NumerologyExplain>,
         @InjectModel(NumerologyCalculateExplain.name)
         private readonly numerologyCalculateExplainModel: Model<NumerologyCalculateExplain>,
         private readonly languageService: LanguageService
-    ) {}
+    ) { }
 
     private readonly charMap = {
         a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 1,
@@ -29,15 +27,15 @@ export class NumerologyService {
 
     recursionDigitSum(n: number): number {
         let s = Array.from(n.toString(), (item) => parseInt(item));
-        const sum = s.reduce((prev, curr) => prev+curr);
+        const sum = s.reduce((prev, curr) => prev + curr);
         return (sum < 10 || sum == 11 || sum == 22 || sum == 33) ? sum : this.recursionDigitSum(sum);
     }
 
     calculateLifePathNumber(dob: Date) {
         const daySum = this.recursionDigitSum(dob.getDate());
-        const monthSum = this.recursionDigitSum(dob.getMonth()+1);
+        const monthSum = this.recursionDigitSum(dob.getMonth() + 1);
         const yearSum = this.recursionDigitSum(dob.getFullYear());
-        const lifePathNumber = this.recursionDigitSum(daySum+monthSum+yearSum);
+        const lifePathNumber = this.recursionDigitSum(daySum + monthSum + yearSum);
         return lifePathNumber;
     }
 
@@ -60,7 +58,7 @@ export class NumerologyService {
             }
             sum += this.recursionDigitSum(tmp);
         }
-        
+
         return this.recursionDigitSum(sum);
     }
 
@@ -79,7 +77,7 @@ export class NumerologyService {
     }
 
     calculateMaturityNumber(lifePathNumber: number, expressionNumber: number) {
-        return this.recursionDigitSum(lifePathNumber+expressionNumber);
+        return this.recursionDigitSum(lifePathNumber + expressionNumber);
     }
 
     calculateBalanceNumber(fullName: string) {
@@ -92,24 +90,24 @@ export class NumerologyService {
 
     calculateChallengeNumbers(dob: Date) {
         const daySum = this.recursionDigitSum(dob.getDate());
-        const monthSum = this.recursionDigitSum(dob.getMonth()+1);
+        const monthSum = this.recursionDigitSum(dob.getMonth() + 1);
         const yearSum = this.recursionDigitSum(dob.getFullYear());
 
-        const first = Math.abs(daySum-monthSum);
-        const second = Math.abs(daySum-yearSum);
-        const third = Math.abs(first-second);
+        const first = Math.abs(daySum - monthSum);
+        const second = Math.abs(daySum - yearSum);
+        const third = Math.abs(first - second);
         return [first, second, third];
     }
 
     calculatePinnacleNumbers(dob: Date) {
         const daySum = this.recursionDigitSum(dob.getDate());
-        const monthSum = this.recursionDigitSum(dob.getMonth()+1);
+        const monthSum = this.recursionDigitSum(dob.getMonth() + 1);
         const yearSum = this.recursionDigitSum(dob.getFullYear());
 
-        const first = this.recursionDigitSum(daySum+monthSum);
-        const second = this.recursionDigitSum(daySum+yearSum);
-        const third = this.recursionDigitSum(first+second);
-        const fourth = this.recursionDigitSum(monthSum+yearSum);
+        const first = this.recursionDigitSum(daySum + monthSum);
+        const second = this.recursionDigitSum(daySum + yearSum);
+        const third = this.recursionDigitSum(first + second);
+        const fourth = this.recursionDigitSum(monthSum + yearSum);
 
         return [first, second, third, fourth]
     }
@@ -138,7 +136,7 @@ export class NumerologyService {
         }
         return hiddenPassionNumbers;
     }
-    
+
     calculateCornerstoneNumber(fullName: string) {
         const firstName = fullName.split(" ").pop();
         return this.charMap[firstName.charAt(0)];
@@ -146,7 +144,7 @@ export class NumerologyService {
 
     calculateCapstoneNumber(fullName: string) {
         const firstName = fullName.split(" ").pop();
-        return this.charMap[firstName.charAt(firstName.length-1)];
+        return this.charMap[firstName.charAt(firstName.length - 1)];
     }
 
     calculateFirstVowelNumber(fullName: string) {
@@ -192,7 +190,7 @@ export class NumerologyService {
         const language = await this.languageService.getOneByCode(dto.lang);
 
         let entry = await this.numerologyEntryModel.findOne({ type: dto.type, lang: language, number: dto.number })
-        
+
         if (entry) {
             entry.content = dto.content;
             entry.summary = dto.summary;
@@ -206,11 +204,6 @@ export class NumerologyService {
             });
         }
 
-        
-        // entry.description = dto.description.map((item) => new this.numerologyEntryDescriptionModel({
-        //     content: item.content,
-        //     lang: item.lang
-        // }));
         entry = await entry.save();
         return await entry.populate("lang");
     }
@@ -233,7 +226,7 @@ export class NumerologyService {
 
     async updateOrCreateExplain(dto: UpdateOrCreateExplainDto) {
         const language = await this.languageService.getOneByCode(dto.lang);
-        
+
         let entity = await this.numerologyExplainModel.findOne({
             type: dto.type,
             lang: language
@@ -275,9 +268,45 @@ export class NumerologyService {
         return entity;
     }
 
+    async saveExplainData(dto: SaveExplainDataDto) {
+        const language = await this.languageService.getOneByCode(dto.lang);
+
+        const explainTypeList = dto.explainList.map(item => item.type);
+        const calculateExplainTypeList = dto.calculateExplainList.map(item => item.type);
+
+        const [
+            explainList,
+            calculateExplainList
+        ] = await Promise.all([
+            this.numerologyExplainModel.find({ lang: language, type: { $in: explainTypeList } }),
+            this.numerologyCalculateExplainModel.find({ lang: language, type: { $in: calculateExplainTypeList } })
+        ]);
+
+        let newExplainList = [];
+        for (const item of dto.explainList) {
+            let entity = explainList.find(element => element.type == item.type);
+            if (!entity) entity = new this.numerologyExplainModel({ lang: language, type: item.type });
+            entity.content = item.content;
+            newExplainList.push(entity);
+        }
+
+        let newCalculateExplainList = [];
+        for (const item of dto.calculateExplainList) {
+            let entity = calculateExplainList.find(element => element.type == item.type);
+            if (!entity) entity = new this.numerologyCalculateExplainModel({ lang: language, type: item.type });
+            entity.content = item.content;
+            newCalculateExplainList.push(entity);
+        }
+
+        await Promise.all([
+            this.numerologyExplainModel.bulkSave(newExplainList),
+            this.numerologyCalculateExplainModel.bulkSave(newCalculateExplainList)
+        ]);
+    }
+
     async getExplainData(query: GetExplainDataQueryDto) {
         const language = await this.languageService.getOneByCode(query.lang);
-        
+
         return await Promise.all([
             this.numerologyExplainModel.find({ lang: language }),
             this.numerologyCalculateExplainModel.find({ lang: language })

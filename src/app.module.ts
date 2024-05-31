@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { MyExceptionFilter, ValidationPipe } from '@utils';
 import { DbModule } from './db/db.module';
 import { NumerologyModule } from '@modules/numerology';
 import { AuthModule } from '@modules/auth';
+import { AuthGuard } from '@modules/auth/auth.guard';
 
 @Module({
   imports: [DbModule, AuthModule, NumerologyModule],
@@ -19,6 +20,10 @@ import { AuthModule } from '@modules/auth';
     {
       provide: APP_PIPE,
       useClass: ValidationPipe
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
     }
   ],
 })

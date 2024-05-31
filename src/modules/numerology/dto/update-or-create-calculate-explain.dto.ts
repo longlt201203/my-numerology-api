@@ -14,6 +14,5 @@ export class UpdateOrCreateCalculateExplainDto {
 
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
     content: string;
 }
