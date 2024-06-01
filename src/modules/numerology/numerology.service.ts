@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, NumerologyResponseDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
+import { CalculateNumerologyResult, GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
-import { Language, NumerologyCalculateExplain, NumerologyEntry, NumerologyExplain } from "@schemas";
+import { NumerologyCalculateExplain, NumerologyEntry, NumerologyExplain } from "@schemas";
 import { Model, Types } from "mongoose";
 import { NumerologyNotFoundApiError } from "./errors";
 import { LanguageService } from "@modules/language";
@@ -156,27 +156,35 @@ export class NumerologyService {
         }
     }
 
-    calculate(dto: NumerologyRequestDto): NumerologyResponseDto {
+    calculate(dto: NumerologyRequestDto): CalculateNumerologyResult {
         const dob = new Date(dto.dob);
         const fullName = dto.fullName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, '');
         const lifePathNumber = this.calculateLifePathNumber(dob);
         const expressionNumber = this.calculateExpressionNumber(fullName);
 
         return {
-            lifePathNumber: lifePathNumber,
-            soulUrgeNumber: this.calculateSoulUrgeNumber(fullName),
-            expressionNumber: expressionNumber,
-            personalityNumber: this.calculatePersonalityNumber(fullName),
-            birthdayNumber: this.calculateBirthdayNumber(dob),
-            maturityNumber: this.calculateMaturityNumber(lifePathNumber, expressionNumber),
-            balanceNumber: this.calculateBalanceNumber(fullName),
-            challengeNumbers: this.calculateChallengeNumbers(dob),
-            pinnacleNumbers: this.calculatePinnacleNumbers(dob),
-            hiddenPassionNumbers: this.calculateHiddenPassionNumber(fullName),
-            cornerstoneNumber: this.calculateCornerstoneNumber(fullName),
-            capstoneNumber: this.calculateCapstoneNumber(fullName),
-            firstVowelNumber: this.calculateFirstVowelNumber(fullName)
+            lifePath: lifePathNumber,
+            soulUrge: this.calculateSoulUrgeNumber(fullName),
+            expression: expressionNumber,
+            personality: this.calculatePersonalityNumber(fullName),
+            birthday: this.calculateBirthdayNumber(dob),
+            maturity: this.calculateMaturityNumber(lifePathNumber, expressionNumber),
+            balance: this.calculateBalanceNumber(fullName),
+            challenge: this.calculateChallengeNumbers(dob),
+            pinnacle: this.calculatePinnacleNumbers(dob),
+            hiddenPassion: this.calculateHiddenPassionNumber(fullName),
+            cornerstone: this.calculateCornerstoneNumber(fullName),
+            capstone: this.calculateCapstoneNumber(fullName),
+            firstVowel: this.calculateFirstVowelNumber(fullName)
         }
+    }
+
+    async readResult(result: CalculateNumerologyResult) {
+
+    }
+
+    async readNumerology(dto: NumerologyRequestDto) {
+        const result = this.calculate(dto);
     }
 
     async findEntry(id: string) {

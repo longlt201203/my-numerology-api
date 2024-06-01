@@ -1,6 +1,14 @@
-import { AccountResponseDto } from "@modules/accounts/dto";
+import { Account } from "@schemas";
+import { ProfileDto } from "./profile.dto";
 
 export class AuthenticateResponseDto {
-    account: AccountResponseDto;
+    profile: ProfileDto;
     accessToken: string;
+
+    static from(account: Account, accessToken: string): AuthenticateResponseDto {
+        return {
+            profile: ProfileDto.fromAccount(account),
+            accessToken: accessToken
+        }
+    }
 }

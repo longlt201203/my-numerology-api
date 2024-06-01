@@ -26,9 +26,6 @@ export class AuthService {
                     case CallbackMode.SIGN_UP:
                         redirectUri = Env.GOOGLE_SIGN_UP_REDIRECT_URI;
                         break;
-                    case CallbackMode.DEVELOPER:
-                        redirectUri = Env.GOOGLE_LOGIN_DEVELOPER_REDIRECT_URI;
-                        break;
                 }
                 return this.googleService.getOauth2Uri({
                     clientId: Env.GOOGLE_CLIENT_ID,
@@ -47,9 +44,6 @@ export class AuthService {
                 break;
             case CallbackMode.SIGN_UP:
                 redirectUri = Env.GOOGLE_SIGN_UP_REDIRECT_URI;
-                break;
-            case CallbackMode.DEVELOPER:
-                redirectUri = Env.GOOGLE_LOGIN_DEVELOPER_REDIRECT_URI;
                 break;
         }
 
