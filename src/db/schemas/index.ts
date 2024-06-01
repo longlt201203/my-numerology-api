@@ -3,3 +3,4 @@ export * from "./account.schema";
 export * from "./language.schema";
 export * from "./numerology-explain.schema";
 export * from "./numerology-calculate-explain.schema";
+export * from "./numberology-number-meaning.schema";

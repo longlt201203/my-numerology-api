@@ -308,7 +308,7 @@ export class NumerologyService {
 
         await Promise.all([
             this.numerologyExplainModel.bulkSave(newExplainList),
-            this.numerologyCalculateExplainModel.bulkSave(newCalculateExplainList)
+            this.numerologyCalculateExplainModel.bulkSave(newCalculateExplainList),
         ]);
     }
 

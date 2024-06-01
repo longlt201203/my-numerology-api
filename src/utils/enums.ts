@@ -20,8 +20,7 @@ export enum OAuthProvider {
 
 export enum CallbackMode {
     LOGIN = "login",
-    SIGN_UP = "signUp",
-    DEVELOPER = "developer"
+    SIGN_UP = "signUp"
 }
 
 export enum NumerologyExplainType {

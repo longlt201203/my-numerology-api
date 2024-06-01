@@ -61,8 +61,8 @@ export class AuthService {
         return tokenInfo;
     }
 
-    async loginWithGoogle(code: string, developer?: boolean): Promise<[Account, string]> {
-        const tokenInfo = await this.getGoogleTokenInfo(code, developer ? CallbackMode.DEVELOPER : CallbackMode.LOGIN);
+    async loginWithGoogle(code: string): Promise<[Account, string]> {
+        const tokenInfo = await this.getGoogleTokenInfo(code, CallbackMode.LOGIN);
         if (!tokenInfo.email) throw new MissingEmailError();
 
         const account = await this.accountsService.getOneByEmail(tokenInfo.email);

@@ -63,4 +63,9 @@ export class NumerologyController {
         await this.numerologyService.saveExplainData(dto);
         return new ApiResponseDto(null, null, "Update successfully!");
     }
+
+    @Put("save-number-meaning-data")
+    async saveNumberMeandingData() {
+        
+    }
 }
