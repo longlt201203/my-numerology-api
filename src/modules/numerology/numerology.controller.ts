@@ -53,8 +53,8 @@ export class NumerologyController {
     @SkipGuard()
     @SwaggerApiResponse(GetExplainDataResponseDto)
     async getExplainData(@Query() query: GetExplainDataQueryDto) {
-        const [explainList, calculateExplainList] = await this.numerologyService.getExplainData(query);
-        return new ApiResponseDto(GetExplainDataResponseDto.from(explainList, calculateExplainList));
+        const data = await this.numerologyService.getExplainData(query);
+        return new ApiResponseDto(GetExplainDataResponseDto.from(data[0], data[1], data[2]));
     }
 
     @Put("save-explain-data")

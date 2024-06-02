@@ -33,8 +33,13 @@ export class AccountsService {
         if (!account) throw new AccountNotFoundError();
         return account;
     }
-    
+
     async getOneByEmail(email: string) {
+        const account = await this.accountModel.findOne({ email: email });
+        return account;
+    }
+    
+    async getOneByEmailOrFail(email: string) {
         const account = await this.accountModel.findOne({ email: email });
         if (!account) throw new AccountNotFoundError();
         return account;

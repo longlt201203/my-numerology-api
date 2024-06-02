@@ -13,3 +13,4 @@ export * from "./save-explain-data.dto";
 export * from "./calculate-numerology-result.dto";
 export * from "./numerology-reading-response.dto";
 export * from "./numerology-result-description.dto";
+export * from "./numerology-number-response.dto";

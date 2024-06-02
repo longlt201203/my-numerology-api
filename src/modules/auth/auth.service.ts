@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, OnModuleInit } from "@nestjs/common";
 import { CallbackMode, Env, OAuthProvider } from "@utils";
 import { GoogleService } from "./modules/google";
 import { MissingEmailError, MissingGoogleIdTokenError } from "./errors";
@@ -8,12 +8,25 @@ import { CryptoService } from "@modules/crypto";
 import { Account } from "@schemas";
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
     constructor(
         private readonly googleService: GoogleService,
         private readonly accountsService: AccountsService,
         private readonly cryptoService: CryptoService
     ) {}
+
+    onModuleInit() {
+        this.createAdminIfNotExists();
+    }
+
+    async createAdminIfNotExists() {
+        const account = await this.accountsService.getOneByEmail(Env.ADMIN_EMAIL);
+        if (!account) {
+            const account = this.accountsService.create({ email: Env.ADMIN_EMAIL, password: await this.cryptoService.hashPassword(this.cryptoService.generateRandomPassword()) });
+            console.log("Admin create!")
+            return account;
+        }
+    }
 
     getLoginUri(query: GetLoginUriQuery) {
         switch (query.provider) {
@@ -65,7 +78,7 @@ export class AuthService {
         const tokenInfo = await this.getGoogleTokenInfo(code, CallbackMode.LOGIN);
         if (!tokenInfo.email) throw new MissingEmailError();
 
-        const account = await this.accountsService.getOneByEmail(tokenInfo.email);
+        const account = await this.accountsService.getOneByEmailOrFail(tokenInfo.email);
         const accessToken = this.cryptoService.signJwtToken(account._id.toString());
 
         return [account, accessToken]

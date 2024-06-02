@@ -18,4 +18,6 @@ export class Env {
     static readonly JWT_SECRET = process.env.JWT_SECRET || "";
     static readonly JWT_ISSUER = process.env.JWT_ISSUER || "";
     static readonly JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "";
+
+    static readonly ADMIN_EMAIL = process.env.ADMIN_EMAIL || "";
 }

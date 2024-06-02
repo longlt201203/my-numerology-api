@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CalculateNumerologyResult, GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
-import { NumerologyCalculateExplain, NumerologyEntry, NumerologyExplain } from "@schemas";
+import { NumerologyCalculateExplain, NumerologyEntry, NumerologyExplain, NumerologyNumberMeaning } from "@schemas";
 import { Model, Types } from "mongoose";
 import { NumerologyNotFoundApiError } from "./errors";
 import { LanguageService } from "@modules/language";
@@ -15,6 +15,8 @@ export class NumerologyService {
         private readonly numerologyExplainModel: Model<NumerologyExplain>,
         @InjectModel(NumerologyCalculateExplain.name)
         private readonly numerologyCalculateExplainModel: Model<NumerologyCalculateExplain>,
+        @InjectModel(NumerologyNumberMeaning.name)
+        private readonly numerologyNumberMeaningModel: Model<NumerologyNumberMeaning>,
         private readonly languageService: LanguageService
     ) { }
 
@@ -317,7 +319,8 @@ export class NumerologyService {
 
         return await Promise.all([
             this.numerologyExplainModel.find({ lang: language }),
-            this.numerologyCalculateExplainModel.find({ lang: language })
+            this.numerologyCalculateExplainModel.find({ lang: language }),
+            this.numerologyNumberMeaningModel.find({ lang: language })
         ]);
     }
 }

@@ -21,12 +21,12 @@ export class AuthController {
         return new ApiResponseDto(this.authService.getLoginUri(query));
     }
 
-    @Get("sign-up-google")
-    @SkipGuard()
-    async signUpWithGoogle(@Query("code") code: string) {
-        const [account, accessToken] = await this.authService.signUpWithGoogle(code);
-        return new ApiResponseDto(AuthenticateResponseDto.from(account, accessToken));
-    }
+    // @Get("sign-up-google")
+    // @SkipGuard()
+    // async signUpWithGoogle(@Query("code") code: string) {
+    //     const [account, accessToken] = await this.authService.signUpWithGoogle(code);
+    //     return new ApiResponseDto(AuthenticateResponseDto.from(account, accessToken));
+    // }
 
     @Get("login-google")
     @SkipGuard()
