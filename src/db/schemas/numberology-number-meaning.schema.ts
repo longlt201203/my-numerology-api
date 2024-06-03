@@ -11,7 +11,7 @@ export class NumerologyNumberMeaning {
     number: number;
 
     @Prop({ type: SchemaTypes.ObjectId })
-    language: Language;
+    lang: Language;
 
     @Prop({ type: SchemaTypes.String })
     content: string;

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CalculateNumerologyResult, GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto } from "./dto";
+import { CalculateNumerologyResult, GetEntriesQueryDto, GetExplainDataQueryDto, NumerologyRequestDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto, UpdateOrCreateNumberExplainDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { NumerologyCalculateExplain, NumerologyEntry, NumerologyExplain, NumerologyNumberMeaning } from "@schemas";
 import { Model, Types } from "mongoose";
@@ -278,18 +278,43 @@ export class NumerologyService {
         return entity;
     }
 
+    async updateOrCreateNumberExplain(dto: UpdateOrCreateNumberExplainDto) {
+        const language = await this.languageService.getOneByCode(dto.lang);
+
+        let entity = await this.numerologyNumberMeaningModel.findOne({
+            number: dto.number,
+            lang: language
+        });
+
+        if (entity) {
+            entity.content = dto.content;
+        } else {
+            entity = new this.numerologyNumberMeaningModel({
+                number: dto.number,
+                lang: language,
+                content: dto.content
+            });
+        }
+
+        entity = await entity.save();
+        return entity;
+    }
+
     async saveExplainData(dto: SaveExplainDataDto) {
         const language = await this.languageService.getOneByCode(dto.lang);
 
         const explainTypeList = dto.explainList.map(item => item.type);
         const calculateExplainTypeList = dto.calculateExplainList.map(item => item.type);
+        const numberExplainNumberList = dto.numberMeaningList.map(item => item.number);
 
         const [
             explainList,
-            calculateExplainList
+            calculateExplainList,
+            numberMeaningList
         ] = await Promise.all([
             this.numerologyExplainModel.find({ lang: language, type: { $in: explainTypeList } }),
-            this.numerologyCalculateExplainModel.find({ lang: language, type: { $in: calculateExplainTypeList } })
+            this.numerologyCalculateExplainModel.find({ lang: language, type: { $in: calculateExplainTypeList } }),
+            this.numerologyNumberMeaningModel.find({ lang: language, number: { $in: numberExplainNumberList } })
         ]);
 
         let newExplainList = [];
@@ -308,9 +333,18 @@ export class NumerologyService {
             newCalculateExplainList.push(entity);
         }
 
+        let newNumberMeaningList = [];
+        for (const item of dto.numberMeaningList) {
+            let entity = numberMeaningList.find(element => element.number == item.number);
+            if (!entity) entity = new this.numerologyNumberMeaningModel({ lang: language, number: item.number });
+            entity.content = item.content;
+            newNumberMeaningList.push(entity);
+        }
+
         await Promise.all([
             this.numerologyExplainModel.bulkSave(newExplainList),
             this.numerologyCalculateExplainModel.bulkSave(newCalculateExplainList),
+            this.numerologyNumberMeaningModel.bulkSave(newNumberMeaningList),
         ]);
     }
 

@@ -8,7 +8,7 @@ export class NumerologyNumberResponseDto {
     static fromEntity(entity: NumerologyNumberMeaning): NumerologyNumberResponseDto {
         return {
             number: entity.number,
-            lang: entity.language.code,
+            lang: entity.lang.code,
             content: entity.content
         }
     }
