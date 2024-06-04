@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Get, Post, Put, Query } from "@nestjs/common";
 import { NumerologyService } from "./numerology.service";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { EntryResponseDto, GetEntriesQueryDto, GetExplainDataQueryDto, GetExplainDataResponseDto, NumerologyCalculateExplainResponseDto, NumerologyExplainResponseDto, NumerologyNumberResponseDto, NumerologyReadingResponseDto, NumerologyRequestDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto, UpdateOrCreateNumberExplainDto } from "./dto";
+import { CalculateNumerologyResult, EntryResponseDto, GetEntriesQueryDto, GetExplainDataQueryDto, GetExplainDataResponseDto, NumerologyCalculateExplainResponseDto, NumerologyExplainResponseDto, NumerologyNumberResponseDto, NumerologyReadingResponseDto, NumerologyRequestDto, SaveExplainDataDto, UpdateOrCreateCalculateExplainDto, UpdateOrCreateEntryDto, UpdateOrCreateExplainDto, UpdateOrCreateNumberExplainDto } from "./dto";
 import { ApiResponseDto, SwaggerApiResponse } from "@utils";
 import { SkipGuard } from "@modules/auth";
 
@@ -14,7 +14,7 @@ export class NumerologyController {
 
     @Post("calculate")
     @SkipGuard()
-    @SwaggerApiResponse(NumerologyReadingResponseDto)
+    @SwaggerApiResponse(CalculateNumerologyResult)
     async calculate(@Body() dto: NumerologyRequestDto) {
         return new ApiResponseDto(this.numerologyService.calculate(dto));
     }
